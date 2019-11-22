@@ -1,0 +1,91 @@
+#! Run Part 1: Update with Result Number and Number of Pages
+
+var result = "e16a13ac12764aa998a348d248ff3f99"
+var pageN = "20" 
+
+
+
+async function getRecordIDs(i)
+{
+	let response = await fetch("http://www.referenceusa.com/UsBusiness/Result/Page", {"credentials":"include","headers":{"accept":"text/html, */*; q=0.01","accept-language":"en-US,en;q=0.9","content-type":"application/x-www-form-urlencoded; charset=UTF-8","request-context":"appId=cid-v1:6f5cad55-8123-4589-8d6d-e647a71d2872","request-id":"|i1F/V.uT4DE","x-requested-with":"XMLHttpRequest"},"referrer":"http://www.referenceusa.com/UsBusiness/Result/" + result,"referrerPolicy":"no-referrer-when-downgrade","body":"requestKey=" + result + "&sort=&direction=Ascending&pageIndex=" + i + "&optionalColumn=","method":"POST","mode":"cors"});
+	let data = await response.text().then(console.log("Count Loaded"))
+	return data;
+}
+
+
+var i;
+var response = new Array();
+for(i =0; i < pageN; i++)
+{
+	getRecordIDs(i)
+		.then(data => response.push(data));
+}
+
+
+
+#! Run Part 2 : After all page data is loaded, join all data, extract ids and push to array adding parameter characters. For each page concat into url string of 25 ids and fetch "UpdateTaggedResults" 
+
+
+response2 = response.join("")
+var record = 'data-recordid="';
+var re = new RegExp(record, 'gi');
+var search = new Array();
+while (re.exec(response2)){
+		search.push('&ids=' + response2.substring(re.lastIndex, re.lastIndex + 9));
+	}
+console.log(search)
+
+
+const sleep = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function downloadData(){
+	let response = await fetch("http://www.referenceusa.com/UsBusiness/Download/DownloadData/" + result, {"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3","accept-language":"en-US,en;q=0.9","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","upgrade-insecure-requests":"1"},"referrer":"http://www.referenceusa.com/UsBusiness/Download/" + result,"referrerPolicy":"no-referrer-when-downgrade","body":"format=CSV&detailLevel=summary&filterCustom=&purchaseId=&customFields=recordId%2CBusinessName%2CFirstNameMatch%2CLastNameMatch%2CAddress%2CCity%2CState%2CZip%2CVerifiedRecord","method":"POST","mode":"cors"});
+	let data = await response.text()
+	return data;
+} 
+
+async function checkBoxes(){fetch("http://www.referenceusa.com/UsBusiness/Result/UpdateTaggedRecords", {"credentials":"include","headers":{"accept":"application/json, text/javascript, */*; q=0.01","accept-language":"en-US,en;q=0.9","content-type":"application/x-www-form-urlencoded; charset=UTF-8","request-context":"appId=cid-v1:6f5cad55-8123-4589-8d6d-e647a71d2872","request-id":"|ArxMD.mhZwV","x-requested-with":"XMLHttpRequest"},"referrer":"http://www.referenceusa.com/UsBusiness/Result/" + result,"referrerPolicy":"no-referrer-when-downgrade","body":"requestKey=" + result + str + "&tag=" + tag,"method":"POST","mode":"cors"});
+}
+
+
+const uncheck = async () => {
+	str = (search.slice(n-25,n).join(""));
+	console.log("Uncheck:" + (n-25) + "-" + n)
+	tag = "false"
+	await checkBoxes();
+	str = search.slice(n,n+25).join("");
+	console.log("Check:" + n + "-" + (n+25));
+	tag = "true";
+	checkBoxes();
+}
+
+const check = async () => {
+	str = search.slice(n,n+25).join("");
+	console.log("Check:" + n + "-" + (n+25))
+	tag = "true"
+	checkBoxes()
+}
+
+const download = async () => {
+	await sleep(1500);
+	downloadData().then(data => downloadedData.push(data));
+	console.log("Pull Data");
+	n = n + 25
+}
+
+var downloadedData = new Array();
+var n = 0;
+var e;
+for(e = 0; e < pageN; e++){
+	if (n < 25) {
+	await check();
+	await download()
+	} else {
+	await sleep(1500);
+	await uncheck();
+	await download();
+	}
+}
+
