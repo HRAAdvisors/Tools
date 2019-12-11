@@ -1,7 +1,7 @@
 #! Run Part 1: Update with Result Number and Number of Pages
 
-var result = "e16a13ac12764aa998a348d248ff3f99"
-var pageN = "20" 
+var result = "10e09e95d11440a8bd9bfd020770230e"
+var pageN = "22" 
 
 
 
@@ -51,19 +51,19 @@ async function checkBoxes(){fetch("http://www.referenceusa.com/UsBusiness/Result
 
 
 const uncheck = async () => {
-	str = (search.slice(n-25,n).join(""));
-	console.log("Uncheck:" + (n-25) + "-" + n)
+	str = (search.slice(n-100,n).join(""));
+	console.log("Uncheck:" + (n-100) + "-" + n)
 	tag = "false"
 	await checkBoxes();
-	str = search.slice(n,n+25).join("");
-	console.log("Check:" + n + "-" + (n+25));
+	str = search.slice(n,n+100).join("");
+	console.log("Check:" + n + "-" + (n+100));
 	tag = "true";
 	checkBoxes();
 }
 
 const check = async () => {
-	str = search.slice(n,n+25).join("");
-	console.log("Check:" + n + "-" + (n+25))
+	str = search.slice(n,n+100).join("");
+	console.log("Check:" + n + "-" + (n+100))
 	tag = "true"
 	checkBoxes()
 }
@@ -72,14 +72,16 @@ const download = async () => {
 	await sleep(1500);
 	downloadData().then(data => downloadedData.push(data));
 	console.log("Pull Data");
-	n = n + 25
+	n = n + 100
 }
+
+var QuarterPageN = Math.ceil(pageN/4)
 
 var downloadedData = new Array();
 var n = 0;
 var e;
-for(e = 0; e < pageN; e++){
-	if (n < 25) {
+for(e = 0; e < QuarterPageN; e++){
+	if (n < 100) {
 	await check();
 	await download()
 	} else {
